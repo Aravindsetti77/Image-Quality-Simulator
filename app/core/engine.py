@@ -3,7 +3,7 @@ import numpy as np
 import onnxruntime as ort
 import os
 
-class PirateEngine:
+class QualityEngine:
     def __init__(self, model_path="realesr-general-x4v3.onnx"):
         self.model_path = model_path
         self.ort_session = None

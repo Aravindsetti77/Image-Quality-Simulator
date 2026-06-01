@@ -5,10 +5,10 @@ from fastapi import FastAPI, UploadFile, Form, HTTPException, File
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.core.engine import PirateEngine
+from app.core.engine import QualityEngine
 
-app = FastAPI(title="PirateEngine API", description="Image Quality Simulation and Upscaling Engine")
-engine = PirateEngine()
+app = FastAPI(title="QualityEngine API", description="Image Quality Simulation and Upscaling Engine")
+engine = QualityEngine()
 
 VALID_TIERS = {
     "none", "camrip", "telesync", "ts", "telecine", "tc", "screener", "scr",
