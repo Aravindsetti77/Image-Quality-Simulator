@@ -1,0 +1,62 @@
+import io
+import cv2
+import numpy as np
+from fastapi import FastAPI, UploadFile, Form, HTTPException, File
+from fastapi.responses import Response, FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from app.core.engine import PirateEngine
+
+app = FastAPI(title="PirateEngine API", description="Image Quality Simulation and Upscaling Engine")
+engine = PirateEngine()
+
+VALID_TIERS = {
+    "none", "camrip", "telesync", "ts", "telecine", "tc", "screener", "scr",
+    "dvdrip", "hdtv", "webrip", "yify", "bdrip", "remux"
+}
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+def read_root():
+    return FileResponse("static/index.html")
+
+@app.post("/api/process-format")
+async def process_format(
+    file: UploadFile = File(...),
+    format_tier: str = Form(...),
+    resolution: str = Form("none"),
+    hdr: str = Form("false")
+):
+    format_tier = format_tier.lower()
+    if format_tier not in VALID_TIERS:
+        raise HTTPException(status_code=400, detail=f"Invalid format_tier. Must be one of: {', '.join(VALID_TIERS)}")
+
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image.")
+
+    # Read image into memory
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    if image is None:
+        raise HTTPException(status_code=400, detail="Could not decode image.")
+
+    try:
+        # Process image using PirateEngine
+        processed_image = engine.process(
+            image, 
+            format_tier, 
+            resolution=resolution, 
+            hdr=(hdr.lower() == "true")
+        )
+        
+        # Encode back to JPEG in memory
+        _, encoded_img = cv2.imencode('.jpg', processed_image)
+        
+        # Return as Response
+        return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
