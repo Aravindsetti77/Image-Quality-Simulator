@@ -3,7 +3,6 @@
 <head>
     <title>PirateEngine: Image Quality Simulator</title>
     <style>
-        /* Minimal CSS purely to make the comparison slider function */
         .slider-container {
             position: relative;
             display: none;
@@ -14,7 +13,7 @@
         .slider-container img {
             width: 100%;
             display: block;
-            pointer-events: none; /* Prevent image dragging */
+            pointer-events: none; 
         }
         .img-overlay {
             position: absolute;
@@ -27,8 +26,6 @@
         .img-overlay img {
             max-width: none;
         }
-        
-        /* The overlaid slider mechanism */
         input[type="range"] {
             position: absolute;
             top: 0;
@@ -36,12 +33,10 @@
             width: 100%;
             height: 100%;
             margin: 0;
-            opacity: 0; /* Make the native input invisible */
-            cursor: ew-resize; /* Show horizontal resize cursor */
+            opacity: 0; 
+            cursor: ew-resize; 
             z-index: 10;
         }
-        
-        /* The visible vertical divider line */
         .slider-line {
             position: absolute;
             top: 0;
@@ -50,11 +45,9 @@
             height: 100%;
             background-color: white;
             z-index: 5;
-            pointer-events: none; /* Let clicks pass through to the input */
+            pointer-events: none; 
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
-        
-        /* The center handle with arrows */
         .slider-button {
             position: absolute;
             top: 50%;
@@ -120,26 +113,16 @@
             <button type="submit" id="submit-btn">Process Image</button>
         </p>
     </form>
-
     <div id="status" style="margin-top: 10px; font-weight: bold;"></div>
-
     <div class="slider-container" id="slider-container">
-        <!-- Original Image (Bottom) -->
         <img id="img-original" src="" alt="Original">
-        
-        <!-- Processed Image (Top, Clipped) -->
         <div class="img-overlay" id="img-overlay">
             <img id="img-processed" src="" alt="Processed">
         </div>
-        
-        <!-- Visible UI Elements for the Slider -->
         <div class="slider-line" id="slider-line"></div>
         <div class="slider-button" id="slider-button">&lt;&gt;</div>
-        
-        <!-- The actual functional (but invisible) input slider -->
         <input type="range" min="0" max="100" value="50" id="slider">
     </div>
-
     <script>
         const form = document.getElementById('upload-form');
         const fileInput = document.getElementById('file');
@@ -153,7 +136,6 @@
         const sliderButton = document.getElementById('slider-button');
         const formatTierSelect = document.getElementById('format_tier');
         const tierInfo = document.getElementById('tier_info');
-
         const tierDescriptions = {
             "none": "No processing applied. The image remains in its original state.",
             "camrip": "CAMRip: Looks like a movie recorded with a handheld camera in a dark theater. Very blurry, washed out colors, and heavy visual noise.",
@@ -167,85 +149,61 @@
             "bdrip": "BDRip: High quality digital copy. Looks very clean but slightly softer, like a standard high-definition download.",
             "remux": "REMUX / 4K UHD: Ultra high quality. Stunningly sharp, perfectly upscaled, and crystal clear with zero compression artifacts."
         };
-
         formatTierSelect.addEventListener('change', function() {
             tierInfo.title = tierDescriptions[this.value] || "Description unavailable.";
         });
-        
-        // Initialize the tooltip on page load
         tierInfo.title = tierDescriptions[formatTierSelect.value];
-
-        // Maintain the exact pixel width of the top image so it doesn't squish when the overlay shrinks
         function updateProcessedImageWidth() {
             if (imgOriginal.clientWidth > 0) {
                 imgProcessed.style.width = imgOriginal.clientWidth + 'px';
                 imgProcessed.style.height = imgOriginal.clientHeight + 'px';
             }
         }
-
         imgOriginal.onload = updateProcessedImageWidth;
         imgProcessed.onload = updateProcessedImageWidth;
         window.onresize = updateProcessedImageWidth;
-
         slider.oninput = function() {
             const val = this.value + "%";
             imgOverlay.style.width = val;
             sliderLine.style.left = val;
             sliderButton.style.left = val;
         };
-
         form.onsubmit = async function(e) {
             e.preventDefault();
-            
             if (!fileInput.files[0]) return;
-
             statusDiv.innerText = "Processing...";
             document.getElementById('submit-btn').disabled = true;
             sliderContainer.style.display = 'none';
-
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
             formData.append('format_tier', document.getElementById('format_tier').value);
             formData.append('resolution', document.getElementById('resolution').value);
             formData.append('hdr', document.getElementById('hdr').checked ? "true" : "false");
-
-            // Read original image for the bottom layer
             const reader = new FileReader();
             reader.onload = function(e) {
                 imgOriginal.src = e.target.result;
             };
             reader.readAsDataURL(fileInput.files[0]);
-
             try {
                 const response = await fetch('/api/process-format', {
                     method: 'POST',
                     body: formData
                 });
-
                 if (!response.ok) {
                     throw new Error("Server error");
                 }
-
                 const blob = await response.blob();
                 const objUrl = URL.createObjectURL(blob);
-                
-                // Set the top layer image to the processed result
                 imgProcessed.src = objUrl;
-                
-                // Show the slider components
                 sliderContainer.style.display = 'block';
                 statusDiv.innerText = "Done! (Left: Processed | Right: Original)";
-                
-                // We must calculate width AFTER setting display: block
                 requestAnimationFrame(() => {
                     updateProcessedImageWidth();
-                    // Reset slider position
                     slider.value = 50;
                     imgOverlay.style.width = "50%";
                     sliderLine.style.left = "50%";
                     sliderButton.style.left = "50%";
                 });
-                
             } catch (err) {
                 statusDiv.innerText = "The Image is already in the required quality";
             } finally {

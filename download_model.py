@@ -26,6 +26,3 @@ if __name__ == "__main__":
     print("please provide your own `realesr-general-x4v3.onnx` file in this directory.")
     print("=" * 60)
     
-    # Example placeholder link (this is a theoretical link for demonstration)
-    # url = "https://huggingface.co/username/realesrgan-onnx/resolve/main/realesr-general-x4v3.onnx"
-    # download_file(url, model_name)

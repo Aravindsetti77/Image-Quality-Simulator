@@ -35,7 +35,6 @@ async def process_format(
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image.")
 
-    # Read image into memory
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -44,7 +43,6 @@ async def process_format(
         raise HTTPException(status_code=400, detail="Could not decode image.")
 
     try:
-        # Process image using PirateEngine
         processed_image = engine.process(
             image, 
             format_tier, 
@@ -52,10 +50,8 @@ async def process_format(
             hdr=(hdr.lower() == "true")
         )
         
-        # Encode back to JPEG in memory
         _, encoded_img = cv2.imencode('.jpg', processed_image)
         
-        # Return as Response
         return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
     
     except Exception as e:
