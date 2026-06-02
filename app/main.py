@@ -11,8 +11,6 @@ from app.core.engine import QualityEngine
 app = FastAPI(title="QualityEngine API", description="Image Quality Simulation and Upscaling Engine")
 engine = QualityEngine()
 
-SECRET_ACCESS_CODE = os.getenv("ACCESS_CODE", "1141")
-
 VALID_TIERS = {
     "none", "camrip", "telesync", "ts", "telecine", "tc", "screener", "scr",
     "dvdrip", "hdtv", "webrip", "yify", "bdrip", "remux"
@@ -60,8 +58,4 @@ async def process_format(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
 
-@app.post("/api/verify-code")
-async def verify_code(access_code: str = Form(...)):
-    if access_code == SECRET_ACCESS_CODE:
-        return {"valid": True}
-    return {"valid": False}
+

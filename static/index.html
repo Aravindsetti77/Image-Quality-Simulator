@@ -225,31 +225,12 @@
             e.preventDefault();
             if (!currentProcessedBlobUrl) return;
             
-            const code = prompt("Please enter the Admin Access Code to download the image:");
-            if (!code) return;
-            
-            const formData = new FormData();
-            formData.append('access_code', code);
-            
-            try {
-                const response = await fetch('/api/verify-code', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.valid) {
-                    const a = document.createElement('a');
-                    a.href = currentProcessedBlobUrl;
-                    a.download = "processed_image.jpg";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                } else {
-                    alert("Invalid Access Code. Download denied.");
-                }
-            } catch (err) {
-                alert("Error verifying code.");
-            }
+            const a = document.createElement('a');
+            a.href = currentProcessedBlobUrl;
+            a.download = "processed_image.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         };
         form.onsubmit = async function (e) {
             e.preventDefault();
