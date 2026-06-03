@@ -5,8 +5,12 @@ import numpy as np
 from fastapi import FastAPI, UploadFile, Form, HTTPException, File
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
+import gc
 
 from app.core.engine import QualityEngine
+
+# Prevent OpenCV from allocating too many threads and consuming memory
+cv2.setNumThreads(1)
 
 app = FastAPI(title="QualityEngine API", description="Image Quality Simulation and Upscaling Engine")
 engine = QualityEngine()
@@ -57,5 +61,14 @@ async def process_format(
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+        
+    finally:
+        # Aggressive memory cleanup to prevent memory leaks on constrained environments like Render
+        if 'contents' in locals(): del contents
+        if 'nparr' in locals(): del nparr
+        if 'image' in locals(): del image
+        if 'processed_image' in locals(): del processed_image
+        if 'encoded_img' in locals(): del encoded_img
+        gc.collect()
 
 

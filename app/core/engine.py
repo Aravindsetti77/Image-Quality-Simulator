@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 import os
+import gc
 
 class QualityEngine:
     def __init__(self, model_path="realesr-general-x4v3.onnx"):
@@ -13,7 +14,13 @@ class QualityEngine:
             raise FileNotFoundError(f"Model not found at {self.model_path}. Please run download_model.py")
         if self.ort_session is None:
             providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
-            self.ort_session = ort.InferenceSession(self.model_path, providers=providers)
+            
+            # Disable memory arena and pattern to prevent memory leaks over time
+            sess_options = ort.SessionOptions()
+            sess_options.enable_mem_pattern = False
+            sess_options.enable_mem_reuse = False
+            
+            self.ort_session = ort.InferenceSession(self.model_path, sess_options=sess_options, providers=providers)
 
     def _add_noise(self, image, percentage):
         row, col, ch = image.shape
@@ -129,10 +136,22 @@ class QualityEngine:
         output_name = self.ort_session.get_outputs()[0].name
         result = self.ort_session.run([output_name], {input_name: input_image})[0]
         
+        # Free memory of input immediately
+        del input_image
+        gc.collect()
+        
         output_image = np.squeeze(result, axis=0)
         output_image = np.clip(output_image, 0.0, 1.0)
         output_image = np.transpose(output_image, (1, 2, 0))
         output_image = (output_image * 255.0).astype(np.uint8)
+        
+        # Cleanup result array
+        del result
+        
+        # In highly constrained environments (e.g. Render free tier 512MB RAM), 
+        # it might be safer to destroy the ONNX session after each inference to guarantee memory release.
+        # However, sess_options above should prevent the leak. We will just ensure aggressive GC.
+        gc.collect()
         
         return output_image
 
