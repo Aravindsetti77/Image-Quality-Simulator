@@ -5,22 +5,17 @@ import os
 import gc
 
 class QualityEngine:
-    def __init__(self, model_path="realesr-general-x4v3.onnx"):
+    def __init__(self, model_path="EDSR_x4.pb"):
         self.model_path = model_path
-        self.ort_session = None
+        self.sr = None
 
     def load_model(self):
         if not os.path.exists(self.model_path):
-            raise FileNotFoundError(f"Model not found at {self.model_path}. Please run download_model.py")
-        if self.ort_session is None:
-            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
-            
-            # Disable memory arena and pattern to prevent memory leaks over time
-            sess_options = ort.SessionOptions()
-            sess_options.enable_mem_pattern = False
-            sess_options.enable_mem_reuse = False
-            
-            self.ort_session = ort.InferenceSession(self.model_path, sess_options=sess_options, providers=providers)
+            raise FileNotFoundError(f"Model not found at {self.model_path}.")
+        if self.sr is None:
+            self.sr = cv2.dnn_superres.DnnSuperResImpl_create()
+            self.sr.readModel(self.model_path)
+            self.sr.setModel('edsr', 4)
 
     def _add_noise(self, image, percentage):
         row, col, ch = image.shape
@@ -126,39 +121,12 @@ class QualityEngine:
     def process_remux(self, image):
         try:
             self.load_model()
-            
-            input_image = image.astype(np.float32) / 255.0
-            
-            input_image = np.transpose(input_image, (2, 0, 1))
-            
-            input_image = np.expand_dims(input_image, axis=0)
-            
-            input_name = self.ort_session.get_inputs()[0].name
-            output_name = self.ort_session.get_outputs()[0].name
-            result = self.ort_session.run([output_name], {input_name: input_image})[0]
-            
-            # Free memory of input immediately
-            del input_image
-            gc.collect()
-            
-            output_image = np.squeeze(result, axis=0)
-            output_image = np.clip(output_image, 0.0, 1.0)
-            output_image = np.transpose(output_image, (1, 2, 0))
-            output_image = (output_image * 255.0).astype(np.uint8)
-            
-            # Cleanup result array
-            del result
-            
-            # In highly constrained environments (e.g. Render free tier 512MB RAM), 
-            # it might be safer to destroy the ONNX session after each inference to guarantee memory release.
-            # However, sess_options above should prevent the leak. We will just ensure aggressive GC.
-            gc.collect()
-            
+            output_image = self.sr.upsample(image)
             return output_image
-        except FileNotFoundError:
-            # Fallback upscaling method if the ONNX model is missing
+        except Exception:
+            # Fallback upscaling method if the EDSR model is missing or runs out of memory
             h, w = image.shape[:2]
-            upscaled = cv2.resize(image, (w * 2, h * 2), interpolation=cv2.INTER_LANCZOS4)
+            upscaled = cv2.resize(image, (w * 4, h * 4), interpolation=cv2.INTER_LANCZOS4)
             return cv2.detailEnhance(upscaled, sigma_s=10, sigma_r=0.15)
 
     def process(self, image, tier, resolution="none", hdr=False):
