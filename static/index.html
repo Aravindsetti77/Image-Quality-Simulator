@@ -231,7 +231,8 @@
                     body: formData
                 });
                 if (!response.ok) {
-                    throw new Error("Server error");
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || "Server error");
                 }
                 const blob = await response.blob();
                 const objUrl = URL.createObjectURL(blob);
@@ -247,7 +248,7 @@
                     sliderButton.style.left = "50%";
                 });
             } catch (err) {
-                statusDiv.innerText = "The Image is already in the required quality";
+                statusDiv.innerText = "Error: " + (err.message || "An error occurred");
             } finally {
                 document.getElementById('submit-btn').disabled = false;
             }

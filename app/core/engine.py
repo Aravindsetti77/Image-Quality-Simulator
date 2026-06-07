@@ -124,36 +124,42 @@ class QualityEngine:
         return res
 
     def process_remux(self, image):
-        self.load_model()
-        
-        input_image = image.astype(np.float32) / 255.0
-        
-        input_image = np.transpose(input_image, (2, 0, 1))
-        
-        input_image = np.expand_dims(input_image, axis=0)
-        
-        input_name = self.ort_session.get_inputs()[0].name
-        output_name = self.ort_session.get_outputs()[0].name
-        result = self.ort_session.run([output_name], {input_name: input_image})[0]
-        
-        # Free memory of input immediately
-        del input_image
-        gc.collect()
-        
-        output_image = np.squeeze(result, axis=0)
-        output_image = np.clip(output_image, 0.0, 1.0)
-        output_image = np.transpose(output_image, (1, 2, 0))
-        output_image = (output_image * 255.0).astype(np.uint8)
-        
-        # Cleanup result array
-        del result
-        
-        # In highly constrained environments (e.g. Render free tier 512MB RAM), 
-        # it might be safer to destroy the ONNX session after each inference to guarantee memory release.
-        # However, sess_options above should prevent the leak. We will just ensure aggressive GC.
-        gc.collect()
-        
-        return output_image
+        try:
+            self.load_model()
+            
+            input_image = image.astype(np.float32) / 255.0
+            
+            input_image = np.transpose(input_image, (2, 0, 1))
+            
+            input_image = np.expand_dims(input_image, axis=0)
+            
+            input_name = self.ort_session.get_inputs()[0].name
+            output_name = self.ort_session.get_outputs()[0].name
+            result = self.ort_session.run([output_name], {input_name: input_image})[0]
+            
+            # Free memory of input immediately
+            del input_image
+            gc.collect()
+            
+            output_image = np.squeeze(result, axis=0)
+            output_image = np.clip(output_image, 0.0, 1.0)
+            output_image = np.transpose(output_image, (1, 2, 0))
+            output_image = (output_image * 255.0).astype(np.uint8)
+            
+            # Cleanup result array
+            del result
+            
+            # In highly constrained environments (e.g. Render free tier 512MB RAM), 
+            # it might be safer to destroy the ONNX session after each inference to guarantee memory release.
+            # However, sess_options above should prevent the leak. We will just ensure aggressive GC.
+            gc.collect()
+            
+            return output_image
+        except FileNotFoundError:
+            # Fallback upscaling method if the ONNX model is missing
+            h, w = image.shape[:2]
+            upscaled = cv2.resize(image, (w * 2, h * 2), interpolation=cv2.INTER_LANCZOS4)
+            return cv2.detailEnhance(upscaled, sigma_s=10, sigma_r=0.15)
 
     def process(self, image, tier, resolution="none", hdr=False):
         tier = tier.lower()
