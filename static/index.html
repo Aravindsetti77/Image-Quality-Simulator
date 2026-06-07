@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>QualityEngine: Image Quality Simulator</title>
+    <title>QualityEngine: AI Image Upscaler</title>
     <style>
         .slider-container {
             position: relative;
@@ -77,26 +77,9 @@
 </head>
 
 <body>
-    <h2>QualityEngine: Image Quality Simulator</h2>
+    <h2>QualityEngine: AI Image Upscaler</h2>
     <form id="upload-form">
         <p>
-            <label>Release Tier:</label>
-            <select name="format_tier" id="format_tier">
-                <option value="none">None</option>
-                <option value="camrip">CAMRip</option>
-                <option value="telesync">Telesync (TS)</option>
-                <option value="telecine">Telecine (TC)</option>
-                <option value="screener">Screener (SCR)</option>
-                <option value="dvdrip">DVDRip</option>
-                <option value="hdtv">HDTV</option>
-                <option value="webrip">WEBRip</option>
-                <option value="yify">YIFY / YTS</option>
-                <option value="bdrip">BDRip</option>
-                <option value="remux">REMUX / 4K UHD</option>
-            </select>
-            <span id="tier_info" style="cursor: help; font-weight: bold; color: #0066cc;"
-                title="Select a tier to see its description">[?]</span>
-            &nbsp;&nbsp;
             <label>Resolution:</label>
             <select name="resolution" id="resolution">
                 <option value="none">None</option>
@@ -125,7 +108,7 @@
             <input type="file" name="file" id="file" accept="image/*" required>
         </p>
         <p>
-            <button type="submit" id="submit-btn">Process Image</button>
+            <button type="submit" id="submit-btn">Upscale Image</button>
         </p>
     </form>
     <div id="status" style="margin-top: 10px; font-weight: bold;"></div>
@@ -168,25 +151,6 @@
         const slider = document.getElementById('slider');
         const sliderLine = document.getElementById('slider-line');
         const sliderButton = document.getElementById('slider-button');
-        const formatTierSelect = document.getElementById('format_tier');
-        const tierInfo = document.getElementById('tier_info');
-        const tierDescriptions = {
-            "none": "No processing applied. The image remains in its original state.",
-            "camrip": "CAMRip: Looks like a movie recorded with a handheld camera in a dark theater. Very blurry, washed out colors, and heavy visual noise.",
-            "telesync": "Telesync (TS): Slightly better than a CAMRip. Still blurry with noticeable noise, but slightly cleaner.",
-            "telecine": "Telecine (TC): Looks like an old film reel transfer. Has a distinct yellowish-green tint and random vertical scratches.",
-            "screener": "Screener (SCR): Looks like an early promotional copy. Features a semi-transparent watermark and noticeable digital compression.",
-            "dvdrip": "DVDRip: The classic early-2000s internet video look. Extremely blocky and pixelated with sharp, jagged edges.",
-            "hdtv": "HDTV: Looks like it was recorded straight from a television broadcast. Features horizontal interlacing lines and a TV channel logo in the corner.",
-            "webrip": "WEBRip: Looks like a low-quality internet stream. Fine details like textures look smeared, and smooth color gradients appear banded.",
-            "yify": "YIFY / YTS: The ultra-compressed movie look. All natural film grain is completely smoothed out, leaving heavy digital blocking in its place.",
-            "bdrip": "BDRip: High quality digital copy. Looks very clean but slightly softer, like a standard high-definition download.",
-            "remux": "REMUX / 4K UHD: Ultra high quality. Stunningly sharp, perfectly upscaled, and crystal clear with zero compression artifacts."
-        };
-        formatTierSelect.addEventListener('change', function () {
-            tierInfo.title = tierDescriptions[this.value] || "Description unavailable.";
-        });
-        tierInfo.title = tierDescriptions[formatTierSelect.value];
         function updateProcessedImageWidth() {
             if (imgOriginal.clientWidth > 0) {
                 imgProcessed.style.width = imgOriginal.clientWidth + 'px';
@@ -244,7 +208,7 @@
             resultsWrapper.style.display = 'none';
 
             const formData = new FormData();
-            formData.append('format_tier', document.getElementById('format_tier').value);
+            formData.append('format_tier', 'remux');
             formData.append('resolution', document.getElementById('resolution').value);
             formData.append('hdr', document.getElementById('hdr').checked ? "true" : "false");
 
