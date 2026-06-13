@@ -1,5 +1,3 @@
-import io
-import os
 import cv2
 import numpy as np
 from fastapi import FastAPI, UploadFile, Form, HTTPException, File
