@@ -262,50 +262,50 @@ class QualityEngine:
         try:
             if tier == "none":
                 res = image.copy()
-        elif tier == "camrip":
-            res = self.process_camrip(image)
-        elif tier == "hdcam":
-            res = self.process_hdcam(image)
-        elif tier == "telesync" or tier == "ts":
-            res = self.process_telesync(image)
-        elif tier == "hdts":
-            res = self.process_hdts(image)
-        elif tier == "workprint" or tier == "wp":
-            res = self.process_workprint(image)
-        elif tier == "vhsrip":
-            res = self.process_vhsrip(image)
-        elif tier == "telecine" or tier == "tc":
-            res = self.process_telecine(image)
-        elif tier == "screener" or tier == "scr":
-            res = self.process_screener(image)
-        elif tier == "r5":
-            res = self.process_r5(image)
-        elif tier == "dvdrip":
-            res = self.process_dvdrip(image)
-        elif tier == "pdtv":
-            res = self.process_pdtv(image)
-        elif tier == "hdtv":
-            res = self.process_hdtv(image)
-        elif tier == "webrip":
-            res = self.process_webrip(image)
-        elif tier == "hdrip":
-            res = self.process_hdrip(image)
-        elif tier == "web-dl":
-            res = self.process_web_dl(image)
-        elif tier == "yify":
-            res = self.process_yify(image)
-        elif tier == "bdscr":
-            res = self.process_bdscr(image)
-        elif tier == "brrip":
-            res = self.process_brrip(image)
-        elif tier == "bdrip":
-            res = self.process_bdrip(image)
-        elif tier == "remux":
-            res = self.process_remux(image, resolution)
-        elif tier == "uhd-remux":
-            res = self.process_uhd_remux(image)
-        else:
-            res = image.copy()
+            elif tier == "camrip":
+                res = self.process_camrip(image)
+            elif tier == "hdcam":
+                res = self.process_hdcam(image)
+            elif tier == "telesync" or tier == "ts":
+                res = self.process_telesync(image)
+            elif tier == "hdts":
+                res = self.process_hdts(image)
+            elif tier == "workprint" or tier == "wp":
+                res = self.process_workprint(image)
+            elif tier == "vhsrip":
+                res = self.process_vhsrip(image)
+            elif tier == "telecine" or tier == "tc":
+                res = self.process_telecine(image)
+            elif tier == "screener" or tier == "scr":
+                res = self.process_screener(image)
+            elif tier == "r5":
+                res = self.process_r5(image)
+            elif tier == "dvdrip":
+                res = self.process_dvdrip(image)
+            elif tier == "pdtv":
+                res = self.process_pdtv(image)
+            elif tier == "hdtv":
+                res = self.process_hdtv(image)
+            elif tier == "webrip":
+                res = self.process_webrip(image)
+            elif tier == "hdrip":
+                res = self.process_hdrip(image)
+            elif tier == "web-dl":
+                res = self.process_web_dl(image)
+            elif tier == "yify":
+                res = self.process_yify(image)
+            elif tier == "bdscr":
+                res = self.process_bdscr(image)
+            elif tier == "brrip":
+                res = self.process_brrip(image)
+            elif tier == "bdrip":
+                res = self.process_bdrip(image)
+            elif tier == "remux":
+                res = self.process_remux(image, resolution)
+            elif tier == "uhd-remux":
+                res = self.process_uhd_remux(image)
+            else:
+                res = image.copy()
         except Exception:
             res = image.copy()
             
