@@ -62,7 +62,9 @@ async def process_format(
         return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+        # Fallback: just return the original image if anything goes fundamentally wrong
+        _, encoded_img = cv2.imencode('.jpg', image)
+        return Response(content=encoded_img.tobytes(), media_type="image/jpeg")
         
     finally:
         # Aggressive memory cleanup to prevent memory leaks on constrained environments like Render

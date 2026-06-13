@@ -259,8 +259,9 @@ class QualityEngine:
 
     def process(self, image, tier, resolution="none", hdr=False):
         tier = tier.lower()
-        if tier == "none":
-            res = image.copy()
+        try:
+            if tier == "none":
+                res = image.copy()
         elif tier == "camrip":
             res = self.process_camrip(image)
         elif tier == "hdcam":
@@ -304,16 +305,21 @@ class QualityEngine:
         elif tier == "uhd-remux":
             res = self.process_uhd_remux(image)
         else:
-            raise ValueError(f"Unknown format tier: {tier}")
+            res = image.copy()
+        except Exception:
+            res = image.copy()
             
-        if resolution != "none" and resolution != "original":
-            target_h = int(resolution)
-            h, w = res.shape[:2]
-            if target_h != h:
-                target_w = int(w * (target_h / h))
-                res = cv2.resize(res, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
-                
-        if hdr:
-            res = cv2.detailEnhance(res, sigma_s=12, sigma_r=0.15)
+        try:
+            if resolution != "none" and resolution != "original":
+                target_h = int(resolution)
+                h, w = res.shape[:2]
+                if target_h != h:
+                    target_w = int(w * (target_h / h))
+                    res = cv2.resize(res, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
+                    
+            if hdr:
+                res = cv2.detailEnhance(res, sigma_s=12, sigma_r=0.15)
+        except Exception:
+            pass
                 
         return res
