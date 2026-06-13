@@ -257,7 +257,7 @@ class QualityEngine:
         res = cv2.detailEnhance(upscaled, sigma_s=12, sigma_r=0.15)
         return res
 
-    def process(self, image, tier, resolution="none", hdr=False):
+    def process(self, image, tier, resolution="none"):
         tier = tier.lower()
         try:
             if tier == "none":
@@ -316,9 +316,6 @@ class QualityEngine:
                 if target_h != h:
                     target_w = int(w * (target_h / h))
                     res = cv2.resize(res, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
-                    
-            if hdr:
-                res = cv2.detailEnhance(res, sigma_s=12, sigma_r=0.15)
         except Exception:
             pass
                 

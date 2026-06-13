@@ -32,8 +32,7 @@ def read_root():
 async def process_format(
     file: UploadFile = File(...),
     format_tier: str = Form(...),
-    resolution: str = Form("none"),
-    hdr: str = Form("false")
+    resolution: str = Form("none")
 ):
     format_tier = format_tier.lower()
     if format_tier not in VALID_TIERS:
@@ -53,8 +52,7 @@ async def process_format(
         processed_image = engine.process(
             image, 
             format_tier, 
-            resolution=resolution, 
-            hdr=(hdr.lower() == "true")
+            resolution=resolution
         )
         
         _, encoded_img = cv2.imencode('.jpg', processed_image)

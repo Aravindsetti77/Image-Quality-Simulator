@@ -124,11 +124,6 @@
                 <option value="480">480p</option>
                 <option value="360">360p</option>
             </select>
-            &nbsp;&nbsp;
-            <label>
-                <input type="checkbox" name="hdr" id="hdr" value="true">
-                Enable HDR Enhancement
-            </label>
         </p>
         <p>
             <label>Sample Images:</label>
@@ -245,7 +240,6 @@
             const formData = new FormData();
             formData.append('format_tier', document.getElementById('format_tier').value);
             formData.append('resolution', document.getElementById('resolution').value);
-            formData.append('hdr', document.getElementById('hdr').checked ? "true" : "false");
 
             if (fileInput.files[0]) {
                 formData.append('file', fileInput.files[0]);
