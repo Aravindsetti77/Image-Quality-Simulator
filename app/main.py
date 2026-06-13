@@ -16,8 +16,10 @@ app = FastAPI(title="QualityEngine API", description="Image Quality Simulation a
 engine = QualityEngine()
 
 VALID_TIERS = {
-    "none", "camrip", "telesync", "ts", "telecine", "tc", "screener", "scr",
-    "dvdrip", "hdtv", "webrip", "yify", "bdrip", "remux"
+    "none", "camrip", "hdcam", "telesync", "ts", "hdts", "workprint", "wp", 
+    "telecine", "tc", "screener", "scr", "vhsrip", "r5", "dvdrip", "pdtv", 
+    "hdtv", "webrip", "hdrip", "web-dl", "yify", "bdscr", "brrip", "bdrip", 
+    "remux", "uhd-remux"
 }
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -80,6 +80,41 @@
     <h2>QualityEngine: AI Image Upscaler</h2>
     <form id="upload-form">
         <p>
+            <label>Release Tier:</label>
+            <select name="format_tier" id="format_tier">
+                <optgroup label="Ultra High Definition (4K+)">
+                    <option value="uhd-remux">UHD Remux</option>
+                </optgroup>
+                <optgroup label="High Definition (1080p/720p)">
+                    <option value="remux" selected>Remux (Untouched Blu-ray)</option>
+                    <option value="bdrip">BDRip</option>
+                    <option value="brrip">BRRip</option>
+                    <option value="bdscr">BDSCR (Blu-ray Screener)</option>
+                    <option value="web-dl">WEB-DL</option>
+                    <option value="hdrip">HDRip</option>
+                    <option value="webrip">WEBRip</option>
+                    <option value="hdtv">HDTV</option>
+                    <option value="yify">YIFY/YTS</option>
+                </optgroup>
+                <optgroup label="Standard Definition">
+                    <option value="dvdrip">DVDRip</option>
+                    <option value="r5">R5</option>
+                    <option value="pdtv">PDTV</option>
+                    <option value="screener">Screener (SCR)</option>
+                    <option value="telecine">Telecine (TC)</option>
+                    <option value="vhsrip">VHSRip</option>
+                    <option value="workprint">Workprint (WP)</option>
+                </optgroup>
+                <optgroup label="Low Quality">
+                    <option value="hdts">HDTS</option>
+                    <option value="telesync">Telesync (TS)</option>
+                    <option value="hdcam">HDCAM</option>
+                    <option value="camrip">CAMRip</option>
+                    <option value="none">None (Passthrough)</option>
+                </optgroup>
+            </select>
+        </p>
+        <p>
             <label>Resolution:</label>
             <select name="resolution" id="resolution">
                 <option value="none">None</option>
@@ -208,7 +243,7 @@
             resultsWrapper.style.display = 'none';
 
             const formData = new FormData();
-            formData.append('format_tier', 'remux');
+            formData.append('format_tier', document.getElementById('format_tier').value);
             formData.append('resolution', document.getElementById('resolution').value);
             formData.append('hdr', document.getElementById('hdr').checked ? "true" : "false");
 
