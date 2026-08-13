@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from pathlib import Path
 from fastapi import FastAPI, UploadFile, Form, HTTPException, File
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -7,11 +8,16 @@ import gc
 
 from app.core.engine import QualityEngine
 
+# Resolve paths relative to this file's location so the app works
+# regardless of the working directory it's launched from.
+BASE_DIR = Path(__file__).resolve().parent.parent  # points to backend/
+STATIC_DIR = BASE_DIR.parent / "static"           # points to IMG/static/
+
 # Prevent OpenCV from allocating too many threads and consuming memory
 cv2.setNumThreads(1)
 
 app = FastAPI(title="QualityEngine API", description="Image Quality Simulation and Upscaling Engine")
-engine = QualityEngine()
+engine = QualityEngine(model_path=str(BASE_DIR / "EDSR_x4.pb"))
 
 VALID_TIERS = {
     "none", "camrip", "hdcam", "telesync", "ts", "hdts", "workprint", "wp", 
@@ -20,11 +26,11 @@ VALID_TIERS = {
     "remux", "uhd-remux"
 }
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 @app.get("/")
 def read_root():
-    return FileResponse("static/index.html")
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 @app.post("/api/process-format")
 async def process_format(

@@ -16,14 +16,17 @@ A lightweight, robust image processing web application built with FastAPI and Op
 
 ```text
 .
-├── app/
-│   ├── main.py            # FastAPI routing, request validation, and endpoint logic
-│   └── core/
-│       └── engine.py      # QualityEngine class handling all OpenCV manipulation logic
-├── static/
-│   └── index.html         # Frontend interface and client-side logic
-├── EDSR_x4.pb             # Pre-trained AI upscaling model
-└── requirements.txt       # Project dependencies
+├── backend/
+│   ├── app/
+│   │   ├── main.py            # FastAPI routing, request validation, and endpoint logic
+│   │   └── core/
+│   │       └── engine.py      # QualityEngine class handling all OpenCV manipulation logic
+│   ├── EDSR_x4.pb             # Pre-trained AI upscaling model
+│   └── requirements.txt       # Project dependencies
+└── static/
+    ├── index.html             # Frontend interface and client-side logic
+    ├── interstellar.jpg       # Sample image
+    └── avatar.jpg             # Sample image
 ```
 
 ## Setup & Installation
