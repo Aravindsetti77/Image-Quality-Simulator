@@ -129,8 +129,8 @@
             <label>Sample Images:</label>
             <select name="sample_image" id="sample_image">
                 <option value="">-- Upload Custom Image --</option>
-                <option value="/static/interstellar.jpg">Interstellar</option>
-                <option value="/static/avatar.jpg">Avatar</option>
+                <option value="./interstellar.jpg">Interstellar</option>
+                <option value="./avatar.jpg">Avatar</option>
             </select>
         </p>
         <p>
@@ -255,7 +255,7 @@
                 imgOriginal.src = sampleImageSelect.value;
             }
             try {
-                const response = await fetch('/api/process-format', {
+                const response = await fetch('https://findyourquality.onrender.com/api/process-format', {
                     method: 'POST',
                     body: formData
                 });

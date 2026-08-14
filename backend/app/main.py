@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, UploadFile, Form, HTTPException, File
 from fastapi.responses import Response, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import gc
 
 from app.core.engine import QualityEngine
@@ -17,6 +18,16 @@ STATIC_DIR = BASE_DIR.parent / "static"           # points to IMG/static/
 cv2.setNumThreads(1)
 
 app = FastAPI(title="QualityEngine API", description="Image Quality Simulation and Upscaling Engine")
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this to specific domains in production if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 engine = QualityEngine(model_path=str(BASE_DIR / "EDSR_x4.pb"))
 
 VALID_TIERS = {
