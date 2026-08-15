@@ -223,6 +223,12 @@ class QualityEngine:
 
     def process_remux(self, image, resolution="none"):
         try:
+            h, w = image.shape[:2]
+            # Protect against OOM on Render free tier (512MB RAM)
+            # EDSR_x4 uses massive memory for anything > 350k pixels
+            if h * w > 350000:
+                raise MemoryError("Image too large for EDSR on constrained server.")
+                
             self.load_model()
             output_image = self.sr.upsample(image)
             return output_image
